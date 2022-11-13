@@ -1,18 +1,10 @@
 <script setup lang="ts">
+
 </script>
 
 <template>
-
-  <RouterView />
+  <router-view ></router-view>
 </template>
 
-<style scoped lang="scss">
-*{
-  padding: 0;
-  margin: 0;
-}
-html,body,#app{
-  width: 100%;
-  height: 100%;
-}
+<style scoped lang="less">
 </style>
