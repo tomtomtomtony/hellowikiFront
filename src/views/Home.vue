@@ -9,10 +9,15 @@
     <!--    页面主体区域-->
     <el-container>
       <el-aside width="200px">
-
+        <el-tree
+          :props="props"
+          :load="loadNode"
+          :data="data"
+          lazy
+          node-key="id"
+        />
       </el-aside>
       <el-main>
-
         <el-button type="primary">
           <el-icon style="vertical-align: middle">
             <i-ep-search />
@@ -26,21 +31,46 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { getTopCategory } from "@/request/home";
-import * as console from "console";
-
+import { getAllMenuCurrentCategory, getTopCategory } from "@/request/home";
+import type Node from "element-plus/es/components/tree/src/model/node";
+import type { Tree } from "@/type/home";
 
 export default defineComponent({
   name: "Home",
   setup() {
-    const topCategory = getTopCategory().then((res)=>{
-      window.console.log(res.data);
-    });
-    return{topCategory}
-  }
+    const props = {
+      id: "id",
+      label: "name",
+      isLeaf: "leaf",
+      children: "children",
+    };
+    let data: Tree[] = [];
+    const loadNode = (node: Node, resolve: (data: Tree[]) => void) => {
+      if (node.level === 0) {
+        getTopCategory().then((res) => {
+          data = res.data[0].map((item: any) => {
+            return {
+              ...item,
+              leaf: item.type != "category",
+            };
+          });
+          resolve(data);
+        });
+      } else {
+        getAllMenuCurrentCategory(node.id).then((res) => {
+          data = res.data[0].map((item: any) => {
+            return {
+              ...item,
+              leaf: item.type != "category",
+            };
+          });
+          resolve(data);
+        });
+      }
+    };
+    return { props, data, loadNode };
+  },
 });
-
-
 </script>
 
 <style lang="less" scoped>
@@ -56,7 +86,7 @@ export default defineComponent({
   align-items: center;
   color: #fff;
   font-size: 20px;
-  > div{
+  > div {
     display: flex;
     align-items: center;
   }

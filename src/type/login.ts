@@ -1,11 +1,11 @@
 export interface LoginFormInt {
-    userName: string;
+  userName: string;
   password: string;
 }
 
 export class LoginData {
-    loginForm: LoginFormInt = {
+  loginForm: LoginFormInt = {
     userName: "",
-        password: ""
-    };
+    password: "",
+  };
 }
