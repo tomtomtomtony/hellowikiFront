@@ -7,7 +7,7 @@ const service = axios.create({
   baseURL: "http://localhost:8080",
   timeout: 5000,
   headers: {
-    "Content-type": "application/json;charset=utf-8",
+    "Content-Type": "application/json;charset=utf-8",
   },
 });
 //请求拦截

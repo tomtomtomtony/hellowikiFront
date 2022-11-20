@@ -9,13 +9,9 @@
     <!--    页面主体区域-->
     <el-container>
       <el-aside width="200px">
-        <el-tree
-          :props="props"
-          :load="loadNode"
-          :data="data"
-          lazy
-          node-key="id"
-        />
+        <side-bar_menu @node-contextmenu="rightClick"></side-bar_menu>
+        <context-menu v-model:show="showRightMenu" :options="optionsComopnent"/>
+        <category_manage ref="categoryManageRef"></category_manage>
       </el-aside>
       <el-main>
         <el-button type="primary">
@@ -27,50 +23,62 @@
       </el-main>
     </el-container>
   </el-container>
+<div>
+</div>
 </template>
-
 <script lang="ts">
-import { defineComponent } from "vue";
-import { getAllMenuCurrentCategory, getTopCategory } from "@/request/home";
-import type Node from "element-plus/es/components/tree/src/model/node";
-import type { Tree } from "@/type/home";
+export default {
+  name: "Home"
+};
+</script>
+<script lang="ts" setup>
+import SideBar_menu from "@/views/menu/index.vue";
+import type { MenuOptions } from "@imengyu/vue3-context-menu";
+import { reactive, ref, unref } from "vue";
+import Category_manage from "@/views/category/categoryManage.vue";
 
-export default defineComponent({
-  name: "Home",
-  setup() {
-    const props = {
-      id: "id",
-      label: "name",
-      isLeaf: "leaf",
-      children: "children",
-    };
-    let data: Tree[] = [];
-    const loadNode = (node: Node, resolve: (data: Tree[]) => void) => {
-      if (node.level === 0) {
-        getTopCategory().then((res) => {
-          data = res.data[0].map((item: any) => {
-            return {
-              ...item,
-              leaf: item.type != "category",
-            };
-          });
-          resolve(data);
-        });
-      } else {
-        getAllMenuCurrentCategory(node.id).then((res) => {
-          data = res.data[0].map((item: any) => {
-            return {
-              ...item,
-              leaf: item.type != "category",
-            };
-          });
-          resolve(data);
-        });
-      }
-    };
-    return { props, data, loadNode };
-  },
-});
+let showRightMenu = ref<boolean>(false);
+let optionsComopnent = reactive<MenuOptions>({
+  items: [],
+  zIndex: 3,
+  minWidth: 230,
+  x: 500,
+  y: 200
+} as MenuOptions);
+
+
+
+const rightClick = (event: MouseEvent, data: object) => {
+  event.preventDefault();
+  //Set the mouse position
+  optionsComopnent.items = [];
+  if (data.type === "category") {
+    handlCategory(data);
+  } else if (data.type === "article") {
+    handlArticle();
+  }
+  optionsComopnent.x = event.x;
+  optionsComopnent.y = event.y;
+  //Show menu
+  showRightMenu.value = true;
+};
+
+let categoryManageRef = ref(null);
+const handlCategory = (currNodeInfo: object) => {
+  window.console.log(currNodeInfo)
+  optionsComopnent.items.push(
+    {
+      label: "新增分类",
+      onClick: () => {
+        categoryManageRef?.value?.handleAdd(currNodeInfo);
+      },
+    },
+    { label: "删除分类" }
+  );
+};
+const handlArticle = () => {
+  optionsComopnent.items.push({ label: "新增文章" }, { label: "删除文章" });
+};
 </script>
 
 <style lang="less" scoped>
@@ -86,6 +94,7 @@ export default defineComponent({
   align-items: center;
   color: #fff;
   font-size: 20px;
+
   > div {
     display: flex;
     align-items: center;

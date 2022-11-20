@@ -64,7 +64,7 @@ export default defineComponent({
         { max: 25, min: 6, message: "密码应为6-25个字符", trigger: "change" },
       ],
     };
-    const ruleFormRef = ref<FormInstance>();
+    const loginFormRef = ref<FormInstance>();
     const submitForm = (formEI: FormInstance | undefined) => {
       if (!formEI) return;
       formEI.validate((valid) => {});
@@ -72,7 +72,7 @@ export default defineComponent({
     const resetForm = () => {
       (data.loginForm.userName = ""), (data.loginForm.password = "");
     };
-    return { ...toRefs(data), loginRules, resetForm, ruleFormRef, submitForm };
+    return { ...toRefs(data), loginRules, resetForm, loginFormRef, submitForm };
   },
 });
 </script>
