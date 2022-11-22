@@ -7,8 +7,8 @@ const service = axios.create({
   baseURL: "http://localhost:8080",
   timeout: 5000,
   headers: {
-    "Content-Type": "application/json;charset=utf-8",
-  },
+    "Content-Type": "application/json;charset=utf-8"
+  }
 });
 //请求拦截
 service.interceptors.request.use((config) => {
@@ -19,8 +19,8 @@ service.interceptors.request.use((config) => {
   return config;
 });
 
-//响应拦截
 
+//响应拦截
 service.interceptors.response.use(
   (res) => {
     const code: number = res.status;

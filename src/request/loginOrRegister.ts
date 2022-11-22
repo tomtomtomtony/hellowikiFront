@@ -1,4 +1,4 @@
-import type { LoginData } from "@/type/login";
+import type { LoginData } from "@/type/loginOrRegister";
 import service from ".";
 
 export function login(data: LoginData) {

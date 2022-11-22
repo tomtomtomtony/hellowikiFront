@@ -28,13 +28,22 @@
           >
           </el-input>
         </el-form-item>
+        <el-form-item label="确认密码" label-width="70px" prop="password" v-show="buttonId==='registerButton'">
+          <el-input
+            v-model="loginForm.password"
+            autocomplete="off"
+            type="password"
+            clearable
+          >
+          </el-input>
+        </el-form-item>
         <!-- 按钮区域 -->
         <div class="login_btns">
           <el-form-item>
             <el-button
               auto-insert-space
               type="primary"
-              @click="submitForm(ruleFormRef)"
+              @click="submitForm(loginFormRef)"
               >确认</el-button
             >
             <el-button auto-insert-space type="info" @click="resetForm"
@@ -46,35 +55,42 @@
     </div>
   </div>
 </template>
-<script lang="ts">
-import { defineComponent, reactive, toRefs, ref } from "vue";
-import { LoginData } from "@/type/login";
+<script lang="ts" setup>
+import { computed, onMounted, reactive, ref } from "vue";
+import { LoginData } from "@/type/loginOrRegister";
 import type { FormInstance } from "element-plus";
-export default defineComponent({
-  name:"Login",
-  setup() {
-    const data = reactive(new LoginData());
-    const loginRules = {
-      userName: [
-        { required: true, message: "请输入用户名", trigger: "change" },
-        { max: 15, min: 6, message: "用户名应为6-15个字符", trigger: "change" },
-      ],
-      password: [
-        { required: true, message: "请输入密码", trigger: "change" },
-        { max: 25, min: 6, message: "密码应为6-25个字符", trigger: "change" },
-      ],
-    };
-    const loginFormRef = ref<FormInstance>();
-    const submitForm = (formEI: FormInstance | undefined) => {
-      if (!formEI) return;
-      formEI.validate((valid) => {});
-    };
-    const resetForm = () => {
-      (data.loginForm.userName = ""), (data.loginForm.password = "");
-    };
-    return { ...toRefs(data), loginRules, resetForm, loginFormRef, submitForm };
-  },
+import { useRoute } from "vue-router";
+
+const router = useRoute();
+
+let buttonId = ()=> {
+  window.console.log(router.params.)
+  return router.params.buttonId;
+};
+onMounted(() => {
+  window.console.log(router.params.buttonId)
 });
+const data = new LoginData();
+let loginForm = reactive(data.loginForm);
+
+const loginRules = {
+  userName: [
+    { required: true, message: "请输入用户名", trigger: "change" },
+    { max: 15, min: 6, message: "用户名应为6-15个字符", trigger: "change" },
+  ],
+  password: [
+    { required: true, message: "请输入密码", trigger: "change" },
+    { max: 25, min: 6, message: "密码应为6-25个字符", trigger: "change" },
+  ],
+};
+const loginFormRef = ref<FormInstance>();
+const submitForm = (formEI: FormInstance | undefined) => {
+  if (!formEI) return;
+  formEI.validate((valid) => {});
+};
+const resetForm = () => {
+  (data.loginForm.userName = ""), (data.loginForm.password = "");
+};
 </script>
 <style lang="less" scoped>
 .login_contain {

@@ -30,16 +30,16 @@
       <el-form-item>
         <el-button auto-insert-space @click="resetForm()">取消</el-button>
         <el-button auto-insert-space @click="confirmAdd(categoryManageFormRef)"
-          >确定</el-button
-        >
+          >确定
+        </el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, toRef } from "vue";
-import { createCategory } from "@/request/categoryManage";
+import { reactive, ref } from "vue";
+import { createCategory, deleteCategory } from "@/request/categoryManage";
 import type { FormInstance } from "element-plus";
 import { CategoryData } from "@/type/categoryManage";
 
@@ -55,7 +55,6 @@ const categoryRules = {
 let showCategoryManage = ref<boolean>(false);
 let title = ref<string>();
 const handleAdd = (currNodeInfo: object) => {
-  window.console.log(currNodeInfo);
   title.value = "新增分类-新分类的上级分类为:" + currNodeInfo.parentName;
   //处理顶级分类
   if (currNodeInfo.parentMenuId == 0) {
@@ -67,28 +66,68 @@ const handleAdd = (currNodeInfo: object) => {
   showCategoryManage.value = true;
 };
 
+const handleDel = (currNodeInfo: object) => {
+  ElMessageBox.confirm("是否要删除分类?", "Warning", {
+    confirmButtonText: "确认",
+    cancelButtonText: "取消",
+    type: "warning",
+    draggable: true,
+  })
+    .then(() => {
+      title.value = "删除分类:" + currNodeInfo.name;
+      window.console.log(currNodeInfo);
+      let data = {
+        menuId: currNodeInfo.id,
+        name: currNodeInfo.name,
+        parentMenuId:
+          currNodeInfo.parentMenuId == 0
+            ? currNodeInfo.id
+            : currNodeInfo.parentMenuId,
+        parentName: currNodeInfo.parentName,
+      };
+      deleteCategory(data).then((res) => {
+        if (res.status != 200) {
+          ElMessage({
+            message: res.message,
+            type: "error",
+          });
+        }else{
+          ElMessage({
+            type: "success",
+            message: "删除成功",
+          });
+        }
+      });
+    })
+    .catch(() => {
+      ElMessage({
+        type: "info",
+        message: "取消删除",
+      });
+    });
+};
+
 let data = new CategoryData();
 let categoreForm = reactive(data.categoryForm);
 const categoryManageFormRef = ref<FormInstance>();
-//const data = reactive(new CategoryData())
 const confirmAdd = (formEI: FormInstance | undefined) => {
   if (!formEI) return;
   formEI.validate((valid) => {
     if (!valid) return;
+    showCategoryManage.value = false;
     createCategory(data.categoryForm).then((res) => {
       window.console.log(data.categoryForm);
-      showCategoryManage.value = false;
-      if (res.code != 200) {
+      if (res.status != 200) {
         ElMessage({
           message: res.message,
           type: "error",
         });
-        return;
+      }else{
+        ElMessage({
+          message: res.message,
+          type: "success",
+        });
       }
-      ElMessage({
-        message: res.message,
-        type: "success",
-      });
     });
   });
 };
@@ -98,7 +137,7 @@ const resetForm = () => {
   data.categoryForm.parentMenuId = 0;
 };
 
-defineExpose({ handleAdd });
+defineExpose({ handleAdd, handleDel });
 </script>
 
 <style scoped></style>
