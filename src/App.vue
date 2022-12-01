@@ -6,13 +6,30 @@
         <span>Hello Wiki</span>
       </div>
       <div>
-        <el-button id="registerButton" auto-insert-space type="primary" round @click="toLoginOrRegister($event)">注册</el-button>
-        <el-button id="loginButton" auto-insert-space type="primary" round @click="toLoginOrRegister($event)">登录</el-button>
-        <el-button auto-insert-space round type="primary">退出</el-button>
+        <el-button
+          id="registerButton"
+          v-show="registerShowFlag"
+          auto-insert-space
+          type="primary"
+          round
+          @click="toRegister"
+          >注册</el-button
+        >
+        <el-button
+          id="loginButton"
+          v-show="loginShowFlag"
+          auto-insert-space
+          type="primary"
+          round
+          @click="toLogin"
+          >登录</el-button
+        >
+        <el-button v-show="logoutShowFlag" round type="primary" @click="logout">退出</el-button>
       </div>
     </el-header>
     <!--    页面主体区域-->
     <el-container>
+<!--      侧边栏区域-->
       <el-aside width="200px">
         <side-bar_menu @node-contextmenu="rightClick"></side-bar_menu>
         <context-menu
@@ -22,7 +39,7 @@
         <category_manage ref="categoryManageRef"></category_manage>
       </el-aside>
       <el-main>
-        <router-view></router-view>
+        <router-view ></router-view>
       </el-main>
     </el-container>
   </el-container>
@@ -30,20 +47,23 @@
 <script setup lang="ts">
 import SideBar_menu from "@/views/menu/index.vue";
 import type { MenuOptions } from "@imengyu/vue3-context-menu";
-import { reactive, ref, unref } from "vue";
+import { computed, reactive, ref } from "vue";
 import Category_manage from "@/views/category/categoryManage.vue";
 import { useRouter } from "vue-router";
-const router = useRouter()
-const toLoginOrRegister = (event:Event) => {
-  const buttonId = event.currentTarget.id.toString();
+import { getItemlLocalStorage, removeItemLocalStorage } from "@/stores/storage";
+import { useLoginStore } from "@/stores/userState";
+
+const router = useRouter();
+const toLogin = () => {
   router.push({
-    path: "LoginOrRegister",
-    params: {
-      buttonId,
-    },
+    path: "/login",
   });
 };
-
+const toRegister = () => {
+  router.push({
+    path: "/register",
+  });
+};
 let showRightMenu = ref<boolean>(false);
 let optionsComopnent = reactive<MenuOptions>({
   items: [],
@@ -70,7 +90,6 @@ const rightClick = (event: MouseEvent, data: object) => {
 
 let categoryManageRef = ref(null);
 const handlCategory = (currNodeInfo: object) => {
-  window.console.log(currNodeInfo);
   optionsComopnent.items.push(
     {
       label: "新增分类",
@@ -86,8 +105,28 @@ const handlCategory = (currNodeInfo: object) => {
     }
   );
 };
+
 const handlArticle = () => {
   optionsComopnent.items.push({ label: "新增文章" }, { label: "删除文章" });
+};
+
+const authStore = useLoginStore();
+const loginShowFlag = computed(() => {
+  return getItemlLocalStorage("userAndToken") == null;
+});
+
+const registerShowFlag = computed(() => {
+  return getItemlLocalStorage("userAndToken") == null;
+});
+
+const logoutShowFlag = computed(() => {
+  return !!getItemlLocalStorage("userAndToken");
+});
+
+const logout = () => {
+  authStore.user = null;
+  removeItemLocalStorage("userAndToken");
+  router.go(0);
 };
 </script>
 <style scoped lang="less">

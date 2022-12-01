@@ -5,6 +5,7 @@
     :data="data"
     lazy
     node-key="id"
+    @node-click="toArticleDetail"
   />
 </template>
 
@@ -17,30 +18,53 @@ export default {
 import { getAllMenuCurrentCategory, getTopCategory } from "@/request/home";
 import type Node from "element-plus/es/components/tree/src/model/node";
 import type { Tree } from "@/type/home";
+import { useRouter } from "vue-router";
 const props = {
   id: "id",
   label: "name",
   isLeaf: "leaf",
 };
+const router = useRouter();
+
+const toArticleDetail = (node: Node) => {
+  if (node.leaf) {
+    router.replace({
+      path: "/article/getArticle",
+      query: {
+        categoryMenuId:node.parentId,
+        articleTitle: node.name,
+        categoryName: node.parentName,
+      },
+    });
+  }
+}
 let data: Tree[] = [];
 //懒加载函数
 const loadNode = (node: Node, resolve: (data: Tree[]) => void) => {
-  if (node.level == 0) {
+  if (node.level === 0) {
     let item1 = { id: 1, name: "分类", isLeaf: false };
     data.push(item1);
     resolve(data);
   } else if (node.level === 1) {
     getTopCategory().then((res) => {
-      data = res.data[0].map((item: any) => {
-        return {
-          ...item,
-          leaf: item.type != "category",
-        };
-      });
-      resolve(data);
+      if (Array.isArray(res.data) && res.data.length > 0) {
+        data = res.data[0]?.map((item: any) => {
+          return {
+            ...item,
+            leaf: item.type != "category",
+          };
+        });
+        resolve(data);
+      }
     });
   } else {
     getAllMenuCurrentCategory(node.key).then((res) => {
+      if (res.status != 200) {
+        ElMessage({
+          message: res.message,
+          type: "error",
+        });
+      }
       data = res.data[0].map((item: any) => {
         return {
           ...item,

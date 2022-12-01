@@ -14,8 +14,8 @@
           <el-input
             v-model="loginForm.userName"
             autocomplete="off"
-            type="text"
             clearable
+            type="text"
           >
           </el-input>
         </el-form-item>
@@ -23,17 +23,8 @@
           <el-input
             v-model="loginForm.password"
             autocomplete="off"
-            type="password"
             clearable
-          >
-          </el-input>
-        </el-form-item>
-        <el-form-item label="确认密码" label-width="70px" prop="password" v-show="buttonId==='registerButton'">
-          <el-input
-            v-model="loginForm.password"
-            autocomplete="off"
             type="password"
-            clearable
           >
           </el-input>
         </el-form-item>
@@ -44,11 +35,11 @@
               auto-insert-space
               type="primary"
               @click="submitForm(loginFormRef)"
-              >确认</el-button
-            >
+              >确认
+            </el-button>
             <el-button auto-insert-space type="info" @click="resetForm"
-              >重置</el-button
-            >
+              >重置
+            </el-button>
           </el-form-item>
         </div>
       </el-form>
@@ -56,41 +47,62 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref } from "vue";
-import { LoginData } from "@/type/loginOrRegister";
+import { reactive, ref } from "vue";
+import { LoginData } from "@/type/login";
 import type { FormInstance } from "element-plus";
-import { useRoute } from "vue-router";
+import { useLoginStore } from "@/stores/userState";
+import { login } from "@/request/login";
+import { setItemLocalStorage } from "@/stores/storage";
+import { useRouter } from "vue-router";
 
-const router = useRoute();
-
-let buttonId = ()=> {
-  window.console.log(router.params.)
-  return router.params.buttonId;
-};
-onMounted(() => {
-  window.console.log(router.params.buttonId)
-});
 const data = new LoginData();
 let loginForm = reactive(data.loginForm);
 
 const loginRules = {
   userName: [
-    { required: true, message: "请输入用户名", trigger: "change" },
-    { max: 15, min: 6, message: "用户名应为6-15个字符", trigger: "change" },
+    { required: true, message: "请输入用户名", trigger: "blur" },
+    { max: 15, min: 6, message: "用户名应为6-15个字符", trigger: "blur" },
   ],
   password: [
-    { required: true, message: "请输入密码", trigger: "change" },
-    { max: 25, min: 6, message: "密码应为6-25个字符", trigger: "change" },
+    { required: true, message: "请输入密码", trigger: "blur" },
+    { max: 25, min: 6, message: "密码应为6-25个字符", trigger: "blur" },
   ],
 };
+
 const loginFormRef = ref<FormInstance>();
+const authStore = useLoginStore();
+const router = useRouter();
+
 const submitForm = (formEI: FormInstance | undefined) => {
   if (!formEI) return;
-  formEI.validate((valid) => {});
+  formEI.validate((valid) => {
+    if (!valid) return;
+    login(data.loginForm).then((res) => {
+      if (res.status != 200) {
+        ElMessage({
+          message: res.data.message,
+          type: "error",
+        });
+      } else {
+        authStore.user = res.data[0];
+        setItemLocalStorage("userAndToken", authStore.user);
+        router.go(0);
+        resetForm();
+        ElMessage({
+          message: "登陆成功",
+          type: "success",
+        });
+      }
+    });
+  });
 };
+
+
 const resetForm = () => {
   (data.loginForm.userName = ""), (data.loginForm.password = "");
 };
+
+
 </script>
 <style lang="less" scoped>
 .login_contain {
@@ -121,6 +133,6 @@ const resetForm = () => {
 
 .login_btns {
   display: flex;
-  justify-content: flex-end;
+  justify-content: right;
 }
 </style>

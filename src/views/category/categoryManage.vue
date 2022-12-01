@@ -57,10 +57,10 @@ let title = ref<string>();
 const handleAdd = (currNodeInfo: object) => {
   title.value = "新增分类-新分类的上级分类为:" + currNodeInfo.parentName;
   //处理顶级分类
-  if (currNodeInfo.parentMenuId == 0) {
+  if (currNodeInfo.parentMenuId != 0) {
     data.categoryForm.parentMenuId = currNodeInfo.id;
   } else {
-    data.categoryForm.parentMenuId = currNodeInfo.parentMenuId;
+    data.categoryForm.parentMenuId = 0;
   }
   data.categoryForm.parentName = currNodeInfo.parentName;
   showCategoryManage.value = true;
@@ -116,13 +116,13 @@ const confirmAdd = (formEI: FormInstance | undefined) => {
     if (!valid) return;
     showCategoryManage.value = false;
     createCategory(data.categoryForm).then((res) => {
-      window.console.log(data.categoryForm);
       if (res.status != 200) {
         ElMessage({
           message: res.message,
           type: "error",
         });
       }else{
+
         ElMessage({
           message: res.message,
           type: "success",
