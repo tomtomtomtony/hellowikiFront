@@ -25,13 +25,12 @@ const props = {
   isLeaf: "leaf",
 };
 const router = useRouter();
-
 const toArticleDetail = (node: Node) => {
   if (node.leaf) {
     router.replace({
       path: "/article/getArticle",
       query: {
-        categoryMenuId:node.parentId,
+        categoryMenuId: node.parentMenuId,
         articleTitle: node.name,
         categoryName: node.parentName,
       },
@@ -42,7 +41,7 @@ let data: Tree[] = [];
 //懒加载函数
 const loadNode = (node: Node, resolve: (data: Tree[]) => void) => {
   if (node.level === 0) {
-    let item1 = { id: 1, name: "分类", isLeaf: false };
+    let item1 = { id: 1, name: "分类", isLeaf: false, rootMenuFlag: true };
     data.push(item1);
     resolve(data);
   } else if (node.level === 1) {

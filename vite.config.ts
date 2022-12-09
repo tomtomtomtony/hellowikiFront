@@ -10,7 +10,6 @@ import Icons from 'unplugin-icons/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-
   plugins: [
     vue(),
     vueJsx(),
@@ -31,7 +30,6 @@ export default defineConfig({
     Icons({
       autoInstall: true,
     }),
-
   ],
   resolve: {
     alias: {

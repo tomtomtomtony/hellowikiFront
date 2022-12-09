@@ -1,5 +1,4 @@
 <template>
-
   <el-container class="home-container">
     <el-header class="el-header">
       <div>
@@ -7,29 +6,32 @@
       </div>
       <div>
         <el-button
-          id="registerButton"
           v-show="registerShowFlag"
+          id="registerButton"
           auto-insert-space
-          type="primary"
           round
+          type="primary"
+          size="small"
           @click="toRegister"
-          >注册</el-button
-        >
-        <el-button
-          id="loginButton"
-          v-show="loginShowFlag"
+          >注册
+        </el-button>
+        <el-button v-show="loginShowFlag" id="loginButton"
           auto-insert-space
-          type="primary"
           round
+          size="small"
+          type="primary"
           @click="toLogin"
           >登录</el-button
         >
-        <el-button v-show="logoutShowFlag" round type="primary" @click="logout">退出</el-button>
+        <el-button v-show="logoutShowFlag" round type="primary" size="small" @click="logout"
+          >退出</el-button>
+        <el-button v-show="permissionShowFlag" round type="primary" size="small" @click="toPermissionManage"
+        >权限管理</el-button>
       </div>
     </el-header>
     <!--    页面主体区域-->
     <el-container>
-<!--      侧边栏区域-->
+      <!--      侧边栏区域-->
       <el-aside width="200px">
         <side-bar_menu @node-contextmenu="rightClick"></side-bar_menu>
         <context-menu
@@ -39,12 +41,12 @@
         <category_manage ref="categoryManageRef"></category_manage>
       </el-aside>
       <el-main>
-        <router-view ></router-view>
+        <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import SideBar_menu from "@/views/menu/index.vue";
 import type { MenuOptions } from "@imengyu/vue3-context-menu";
 import { computed, reactive, ref } from "vue";
@@ -52,8 +54,15 @@ import Category_manage from "@/views/category/categoryManage.vue";
 import { useRouter } from "vue-router";
 import { getItemlLocalStorage, removeItemLocalStorage } from "@/stores/storage";
 import { useLoginStore } from "@/stores/userState";
+import { deleteArticle } from "@/request/articleManage";
+import { ArticleData } from "@/type/articleManage";
 
 const router = useRouter();
+const toPermissionManage = () => {
+  router.replace({
+    path: "/permission",
+  });
+};
 const toLogin = () => {
   router.push({
     path: "/login",
@@ -77,7 +86,7 @@ const rightClick = (event: MouseEvent, data: object) => {
   event.preventDefault();
   //Set the mouse position
   optionsComopnent.items = [];
-  if (data.type === "category") {
+  if (data.type === "category" || "分类") {
     handlCategory(data);
   } else if (data.type === "article") {
     handlArticle();
@@ -90,6 +99,19 @@ const rightClick = (event: MouseEvent, data: object) => {
 
 let categoryManageRef = ref(null);
 const handlCategory = (currNodeInfo: object) => {
+  if ("rootMenuFlag" in currNodeInfo) {
+    optionsComopnent.items.push({
+      label: "新增分类",
+      onClick: () => {
+        categoryManageRef?.value?.handleAdd(currNodeInfo);
+      },
+    });
+    return;
+  }
+  if (currNodeInfo.leaf) {
+    handlArticle(currNodeInfo);
+    return;
+  }
   optionsComopnent.items.push(
     {
       label: "新增分类",
@@ -102,12 +124,54 @@ const handlCategory = (currNodeInfo: object) => {
       onClick: () => {
         categoryManageRef?.value?.handleDel(currNodeInfo);
       },
+    },
+    {
+      label: "新增文章",
+      onClick: () => {
+        router.replace({
+          path: "/article/createEdit",
+          query: {
+            categoryMenuId: currNodeInfo.id,
+            articleTitle: "",
+            categoryName: currNodeInfo.name,
+            aimTo: "create",
+          },
+        });
+      },
     }
   );
 };
 
-const handlArticle = () => {
-  optionsComopnent.items.push({ label: "新增文章" }, { label: "删除文章" });
+const handlArticle = (currNodeInfo: object) => {
+  optionsComopnent.items.push(
+    { label: "编辑文章" },
+    {
+      label: "删除文章",
+      onClick: () => {
+        window.console.log(currNodeInfo);
+        let data = new ArticleData().articleForm;
+        data.articleId = currNodeInfo.id;
+        data.articleTitle = currNodeInfo.name;
+        data.categoryName = currNodeInfo.parentName;
+        data.categoryMenuId = currNodeInfo.parentMenuId;
+        deleteArticle(data).then((res) => {
+          if (res.status != 200) {
+            ElMessage({
+              message: res.message,
+              type: "error",
+            });
+            return;
+          } else {
+            ElMessage({
+              message: res.message,
+              type: "success",
+            });
+            router.go(0);
+          }
+        });
+      },
+    }
+  );
 };
 
 const authStore = useLoginStore();
@@ -122,14 +186,16 @@ const registerShowFlag = computed(() => {
 const logoutShowFlag = computed(() => {
   return !!getItemlLocalStorage("userAndToken");
 });
-
+const permissionShowFlag = computed(() => {
+  return !!getItemlLocalStorage("userAndToken");
+});
 const logout = () => {
   authStore.user = null;
   removeItemLocalStorage("userAndToken");
   router.go(0);
 };
 </script>
-<style scoped lang="less">
+<style lang="less" scoped>
 .home-container {
   width: 100%;
   height: 100%;

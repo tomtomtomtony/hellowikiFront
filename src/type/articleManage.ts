@@ -2,6 +2,10 @@ export interface ArticleFormInt {
   articleTitle: string;
   categoryName: string;
   categoryMenuId: number;
+  articleContent: string;
+  keywords: string[];
+  author: string;
+  articleId: number;
 }
 
 export class ArticleData {
@@ -9,5 +13,9 @@ export class ArticleData {
     articleTitle: "",
     categoryName: "",
     categoryMenuId: 0,
+    articleContent: "",
+    keywords: [],
+    author: "",
+    articleId: 0,
   };
 }

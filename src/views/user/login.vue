@@ -80,7 +80,7 @@ const submitForm = (formEI: FormInstance | undefined) => {
     login(data.loginForm).then((res) => {
       if (res.status != 200) {
         ElMessage({
-          message: res.data.message,
+          message: res.message,
           type: "error",
         });
       } else {
@@ -97,12 +97,9 @@ const submitForm = (formEI: FormInstance | undefined) => {
   });
 };
 
-
 const resetForm = () => {
   (data.loginForm.userName = ""), (data.loginForm.password = "");
 };
-
-
 </script>
 <style lang="less" scoped>
 .login_contain {

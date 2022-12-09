@@ -42,6 +42,7 @@ import { reactive, ref } from "vue";
 import { createCategory, deleteCategory } from "@/request/categoryManage";
 import type { FormInstance } from "element-plus";
 import { CategoryData } from "@/type/categoryManage";
+import router from "@/router";
 
 const categoryRules = {
   name: [
@@ -55,14 +56,16 @@ const categoryRules = {
 let showCategoryManage = ref<boolean>(false);
 let title = ref<string>();
 const handleAdd = (currNodeInfo: object) => {
-  title.value = "新增分类-新分类的上级分类为:" + currNodeInfo.parentName;
+  //清空
+  data.categoryForm.name = "";
+  title.value = "新增分类-新分类的上级分类为:" + currNodeInfo.name;
   //处理顶级分类
-  if (currNodeInfo.parentMenuId != 0) {
+  if ("parentMenuId" in currNodeInfo) {
     data.categoryForm.parentMenuId = currNodeInfo.id;
-  } else {
+  } else if ("topMenuId" in currNodeInfo) {
     data.categoryForm.parentMenuId = 0;
   }
-  data.categoryForm.parentName = currNodeInfo.parentName;
+  data.categoryForm.parentName = currNodeInfo.name;
   showCategoryManage.value = true;
 };
 
@@ -75,7 +78,6 @@ const handleDel = (currNodeInfo: object) => {
   })
     .then(() => {
       title.value = "删除分类:" + currNodeInfo.name;
-      window.console.log(currNodeInfo);
       let data = {
         menuId: currNodeInfo.id,
         name: currNodeInfo.name,
@@ -96,6 +98,8 @@ const handleDel = (currNodeInfo: object) => {
             type: "success",
             message: "删除成功",
           });
+          router.go(0);
+
         }
       });
     })
@@ -115,14 +119,16 @@ const confirmAdd = (formEI: FormInstance | undefined) => {
   formEI.validate((valid) => {
     if (!valid) return;
     showCategoryManage.value = false;
+    if (data.categoryForm.parentName == undefined || null) {
+      data.categoryForm.parentName = data.categoryForm.name;
+    }
     createCategory(data.categoryForm).then((res) => {
       if (res.status != 200) {
         ElMessage({
           message: res.message,
           type: "error",
         });
-      }else{
-
+      } else {
         ElMessage({
           message: res.message,
           type: "success",
@@ -132,6 +138,7 @@ const confirmAdd = (formEI: FormInstance | undefined) => {
   });
 };
 const resetForm = () => {
+  showCategoryManage.value = false;
   data.categoryForm.name = "";
   data.categoryForm.parentName = "";
   data.categoryForm.parentMenuId = 0;

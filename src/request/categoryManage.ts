@@ -3,8 +3,8 @@ import type { CategoryFormInt } from "@/type/categoryManage";
 
 //新建分类
 export function createCategory(data: CategoryFormInt) {
-  return service({
-    url: 'api/v1/category/create',
+  return service.authorService({
+    url: "api/v1/category/create",
     method: "post",
     data,
   });
@@ -13,7 +13,7 @@ export function createCategory(data: CategoryFormInt) {
 
 //删除分类
 export function deleteCategory(data: CategoryFormInt) {
-  return service({
+  return service.authorService({
     url: "api/v1/category/del",
     method: "post",
     data,
