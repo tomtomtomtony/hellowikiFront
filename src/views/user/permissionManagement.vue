@@ -1,22 +1,19 @@
 <template>
   <el-tabs type="border-card">
     <el-tab-pane label="User">
-      <user-manage></user-manage>
+      <template>
+        <user-manage></user-manage>
+      </template>
     </el-tab-pane>
     <el-tab-pane label="Article">
-      <article-manage></article-manage>
     </el-tab-pane>
 
   </el-tabs>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import UserManage from "@/views/user/components/userManage.vue"
+
+</script>
 
 <style scoped></style>
-<script>
-import UserManage from "./components/userManage.vue";
-import ArticleManage from "./components/articleManage.vue";
-export default {
-  components: { ArticleManage, UserManage },
-}
-</script>

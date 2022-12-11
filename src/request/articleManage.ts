@@ -33,3 +33,11 @@ export function deleteArticle(data: ArticleFormInt) {
     data,
   });
 }
+
+export function getAllArticleInfo(data: ArticleFormInt) {
+  return service.authorService({
+    url: "api/v1/menu/getAll",
+    method: "post",
+    data,
+  });
+}

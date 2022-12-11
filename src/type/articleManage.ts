@@ -1,21 +1,25 @@
 export interface ArticleFormInt {
   articleTitle: string;
   categoryName: string;
-  categoryMenuId: number;
   articleContent: string;
+  parentPath: string;
+  path: string;
   keywords: string[];
   author: string;
-  articleId: number;
+  pageSize: number;
+  pageNum: number;
 }
 
 export class ArticleData {
   articleForm: ArticleFormInt = {
     articleTitle: "",
     categoryName: "",
-    categoryMenuId: 0,
     articleContent: "",
+    parentPath: "",
+    path: "",
     keywords: [],
     author: "",
-    articleId: 0,
+    pageNum: 1,
+    pageSize: 10,
   };
 }

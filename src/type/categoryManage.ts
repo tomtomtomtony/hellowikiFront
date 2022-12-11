@@ -1,13 +1,15 @@
 export interface CategoryFormInt {
   name: string;
-  parentMenuId: number;
   parentName: string;
+  path: string;
+  parentPath:string;
 }
 
 export class CategoryData {
   categoryForm: CategoryFormInt = {
     name: "",
-    parentMenuId: 0,
     parentName: "",
+    path: "",
+    parentPath:"",
   };
 }

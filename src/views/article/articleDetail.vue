@@ -32,12 +32,8 @@ let articleJson = new ArticleData().articleForm;
 //监视路由参数变化
 watchEffect(() => {
   articleHtml.value = "";
-  data.articleTitle = route.query.articleTitle;
-  data.categoryMenuId = Number(route.query.categoryMenuId);
-  data.categoryName = route.query.categoryName;
-  //为编辑作准备
-  articleJson.categoryMenuId = data.categoryMenuId;
-  articleJson.categoryName = data.categoryName;
+  data.path =route.query.path
+  data.parentPath=route.query.parentPath
   getArticleDetail(data).then((res) => {
     if (Array.isArray(res.data)) {
       let jsonObject = JSON.parse(res.data[0]);
@@ -56,18 +52,14 @@ onMounted(() => {
 });
 const queryArticle = () => {
   articleHtml.value = "";
-  data.articleTitle = route.query.articleTitle;
-  data.categoryMenuId = Number(route.query.categoryMenuId);
-  data.categoryName = route.query.categoryName;
-  //为编辑作准备
-  articleJson.categoryMenuId = data.categoryMenuId;
-  articleJson.categoryName = data.categoryName;
+  data.path =route.query.path
+  data.parentPath=route.query.parentPath
   getArticleDetail(data).then((res) => {
     if (Array.isArray(res.data)) {
       let jsonObject = JSON.parse(res.data[0]);
       articleJson = jsonObject; //为编辑作准备
-      articleJson.categoryMenuId = data.categoryMenuId;
-      articleJson.categoryName = data.categoryName;
+      articleJson.path = data.path;
+      articleJson.parentPath=data.parentPath
       let md = new MarkdownIt();
       md.use(hljs).use(latex);
       articleHtml.content = md.render(jsonObject.content);

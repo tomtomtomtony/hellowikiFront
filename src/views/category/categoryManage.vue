@@ -21,12 +21,10 @@
           show-word-limit
         ></el-input>
       </el-form-item>
-      <el-form-item v-show="false" prop="parentName">
-        <el-input v-model="categoreForm.parentName" />
+      <el-form-item v-show="false" prop="path">
+        <el-input v-model="categoreForm.path" />
       </el-form-item>
-      <el-form-item v-show="false" prop="parentMenuId">
-        <el-input v-model="categoreForm.parentMenuId" />
-      </el-form-item>
+
       <el-form-item>
         <el-button auto-insert-space @click="resetForm()">取消</el-button>
         <el-button auto-insert-space @click="confirmAdd(categoryManageFormRef)"
@@ -59,13 +57,12 @@ const handleAdd = (currNodeInfo: object) => {
   //清空
   data.categoryForm.name = "";
   title.value = "新增分类-新分类的上级分类为:" + currNodeInfo.name;
-  //处理顶级分类
-  if ("parentMenuId" in currNodeInfo) {
-    data.categoryForm.parentMenuId = currNodeInfo.id;
-  } else if ("topMenuId" in currNodeInfo) {
-    data.categoryForm.parentMenuId = 0;
+  if ("rootMenuFlag" in currNodeInfo){
+    data.categoryForm.path = "";
+  }else {
+    data.categoryForm.parentPath = currNodeInfo.path;
   }
-  data.categoryForm.parentName = currNodeInfo.name;
+  window.console.log(currNodeInfo)
   showCategoryManage.value = true;
 };
 
@@ -79,13 +76,7 @@ const handleDel = (currNodeInfo: object) => {
     .then(() => {
       title.value = "删除分类:" + currNodeInfo.name;
       let data = {
-        menuId: currNodeInfo.id,
-        name: currNodeInfo.name,
-        parentMenuId:
-          currNodeInfo.parentMenuId == 0
-            ? currNodeInfo.id
-            : currNodeInfo.parentMenuId,
-        parentName: currNodeInfo.parentName,
+        path: currNodeInfo.path,
       };
       deleteCategory(data).then((res) => {
         if (res.status != 200) {
@@ -119,9 +110,7 @@ const confirmAdd = (formEI: FormInstance | undefined) => {
   formEI.validate((valid) => {
     if (!valid) return;
     showCategoryManage.value = false;
-    if (data.categoryForm.parentName == undefined || null) {
-      data.categoryForm.parentName = data.categoryForm.name;
-    }
+
     createCategory(data.categoryForm).then((res) => {
       if (res.status != 200) {
         ElMessage({
@@ -133,6 +122,8 @@ const confirmAdd = (formEI: FormInstance | undefined) => {
           message: res.message,
           type: "success",
         });
+        router.go(0);
+
       }
     });
   });
@@ -141,7 +132,6 @@ const resetForm = () => {
   showCategoryManage.value = false;
   data.categoryForm.name = "";
   data.categoryForm.parentName = "";
-  data.categoryForm.parentMenuId = 0;
 };
 
 defineExpose({ handleAdd, handleDel });

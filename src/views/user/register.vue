@@ -57,14 +57,14 @@
 
 <script lang="ts" setup>
 import { RegisterData } from "@/type/register";
-import { reactive, ref } from "vue";
+import { reactive, ref, unref } from "vue";
 import type { FormInstance } from "element-plus";
 import { register } from "@/request/register";
 
 const registerRules = {
   userName: [
-    { required: true, message: "请输入用户名", trigger: "change" },
-    { max: 15, min: 6, message: "用户名应为6-15个字符", trigger: "change" },
+    { required: true, message: "请输入用户名", trigger: "blur" },
+    { max: 15, min: 6, message: "用户名应为6-15个字符", trigger: "blur" },
   ],
   password: [
     { required: true, message: "请输入密码", trigger: "change" },
@@ -103,7 +103,7 @@ const submitForm = (formEI: FormInstance | undefined) => {
 
 
 const resetForm = () => {
-  (data.registerForm.userName = ""), (data.registerForm.password = ""),(data.registerForm.confirmPwd="");
+  registerFormRef.value.resetFields()
 };
 </script>
 

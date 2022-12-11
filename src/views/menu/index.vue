@@ -26,13 +26,13 @@ const props = {
 };
 const router = useRouter();
 const toArticleDetail = (node: Node) => {
+  window.console.log(node)
   if (node.leaf) {
     router.replace({
       path: "/article/getArticle",
       query: {
-        categoryMenuId: node.parentMenuId,
-        articleTitle: node.name,
-        categoryName: node.parentName,
+        path: node.path,
+        parentPath:node.parentPath,
       },
     });
   }
@@ -57,7 +57,7 @@ const loadNode = (node: Node, resolve: (data: Tree[]) => void) => {
       }
     });
   } else {
-    getAllMenuCurrentCategory(node.key).then((res) => {
+    getAllMenuCurrentCategory(node.data.path).then((res) => {
       if (res.status != 200) {
         ElMessage({
           message: res.message,

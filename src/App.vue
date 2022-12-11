@@ -99,6 +99,7 @@ const rightClick = (event: MouseEvent, data: object) => {
 
 let categoryManageRef = ref(null);
 const handlCategory = (currNodeInfo: object) => {
+  //处理顶级菜单添加分类
   if ("rootMenuFlag" in currNodeInfo) {
     optionsComopnent.items.push({
       label: "新增分类",
@@ -131,7 +132,7 @@ const handlCategory = (currNodeInfo: object) => {
         router.replace({
           path: "/article/createEdit",
           query: {
-            categoryMenuId: currNodeInfo.id,
+            parentPath: currNodeInfo.path,
             articleTitle: "",
             categoryName: currNodeInfo.name,
             aimTo: "create",
@@ -150,17 +151,15 @@ const handlArticle = (currNodeInfo: object) => {
       onClick: () => {
         window.console.log(currNodeInfo);
         let data = new ArticleData().articleForm;
-        data.articleId = currNodeInfo.id;
-        data.articleTitle = currNodeInfo.name;
-        data.categoryName = currNodeInfo.parentName;
-        data.categoryMenuId = currNodeInfo.parentMenuId;
+        data.path = currNodeInfo.path;
+        data.parentPath = currNodeInfo.parentPath;
+        data.articleTitle = currNodeInfo.articleTitle;
         deleteArticle(data).then((res) => {
           if (res.status != 200) {
             ElMessage({
               message: res.message,
               type: "error",
             });
-            return;
           } else {
             ElMessage({
               message: res.message,

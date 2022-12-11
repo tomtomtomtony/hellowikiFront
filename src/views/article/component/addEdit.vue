@@ -56,31 +56,31 @@ let title = ref<string>("");
 let data = new ArticleData();
 let articleForm = reactive(data.articleForm);
 const createArticleFormRef = ref<FormInstance>();
-let disEditabel=ref(false)
+let disEditabel = ref(false);
 const handleAddEdit = () => {
   if ("aimTo" in route.query && route.query.aimTo === "create") {
     title.value = "新增";
-    articleForm.categoryMenuId = Number(route.query.categoryMenuId);
     articleForm.categoryName = route.query.categoryName;
+    articleForm.parentPath = route.query.parentPath;
     articleForm.author = getItemlLocalStorage("userAndToken")?.userName;
   } else if ("aimTo" in route.query && route.query.aimTo === "edit") {
     title.value = "编辑";
     disEditabel.value = true;
-    articleForm.categoryMenuId = getItemlLocalStorage("articleJsonStr")?.categoryMenuId;
-    articleForm.categoryName = getItemlLocalStorage("articleJsonStr")?.categoryName;
     articleForm.author = getItemlLocalStorage("userAndToken")?.userName;
     articleForm.articleTitle = getItemlLocalStorage("articleJsonStr")?.title;
-    articleForm.articleContent = getItemlLocalStorage("articleJsonStr")?.content;
+    articleForm.articleContent =
+      getItemlLocalStorage("articleJsonStr")?.content;
     articleForm.keywords = getItemlLocalStorage("articleJsonStr")?.keywords;
+    articleForm.path = getItemlLocalStorage("articleJsonStr")?.path;
+    articleForm.parentPath = getItemlLocalStorage("articleJsonStr")?.parentPath;
     removeItemLocalStorage("articleJsonStr");
   }
-
 };
 const confirmAdd = (formEI: FormInstance | undefined) => {
   if (!formEI) return;
   formEI.validate((valid) => {
     if (!valid) return;
-    if (title.value === '新增'){
+    if (title.value === "新增") {
       createArticle(data.articleForm).then((res) => {
         if (res.status != 200) {
           ElMessage({
@@ -95,7 +95,7 @@ const confirmAdd = (formEI: FormInstance | undefined) => {
           });
         }
       });
-    }else if (title.value==='编辑'){
+    } else if (title.value === "编辑") {
       updateArticle(data.articleForm).then((res) => {
         if (res.status != 200) {
           ElMessage({
@@ -103,24 +103,24 @@ const confirmAdd = (formEI: FormInstance | undefined) => {
             type: "error",
           });
         } else {
-          router.go(0);
           ElMessage({
             message: res.message,
             type: "success",
           });
+          router.go(0);
+
         }
       });
     }
   });
 };
 
-
 const resetForm = () => {
   articleForm.articleTitle = "";
   articleForm.keywords = [];
   articleForm.articleContent = "";
 };
-defineExpose({ });
+defineExpose({});
 </script>
 
 <style scoped></style>
