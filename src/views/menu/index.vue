@@ -26,13 +26,12 @@ const props = {
 };
 const router = useRouter();
 const toArticleDetail = (node: Node) => {
-  window.console.log(node)
   if (node.leaf) {
     router.replace({
       path: "/article/getArticle",
       query: {
         path: node.path,
-        parentPath:node.parentPath,
+        parentPath: node.parentPath,
       },
     });
   }

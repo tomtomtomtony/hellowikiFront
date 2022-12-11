@@ -15,7 +15,9 @@
           @click="toRegister"
           >注册
         </el-button>
-        <el-button v-show="loginShowFlag" id="loginButton"
+        <el-button
+          v-show="loginShowFlag"
+          id="loginButton"
           auto-insert-space
           round
           size="small"
@@ -23,10 +25,22 @@
           @click="toLogin"
           >登录</el-button
         >
-        <el-button v-show="logoutShowFlag" round type="primary" size="small" @click="logout"
-          >退出</el-button>
-        <el-button v-show="permissionShowFlag" round type="primary" size="small" @click="toPermissionManage"
-        >权限管理</el-button>
+        <el-button
+          v-show="logoutShowFlag"
+          round
+          type="primary"
+          size="small"
+          @click="logout"
+          >退出</el-button
+        >
+        <el-button
+          v-show="permissionShowFlag"
+          round
+          type="primary"
+          size="small"
+          @click="toPermissionManage"
+          >权限管理</el-button
+        >
       </div>
     </el-header>
     <!--    页面主体区域-->
@@ -52,27 +66,14 @@ import type { MenuOptions } from "@imengyu/vue3-context-menu";
 import { computed, reactive, ref } from "vue";
 import Category_manage from "@/views/category/categoryManage.vue";
 import { useRouter } from "vue-router";
-import { getItemlLocalStorage, removeItemLocalStorage } from "@/stores/storage";
-import { useLoginStore } from "@/stores/userState";
+
 import { deleteArticle } from "@/request/articleManage";
 import { ArticleData } from "@/type/articleManage";
+import { getItemlLocalStorage, removeItemLocalStorage } from "@/stores/storage";
+import { useLoginStore } from "@/stores/userState";
 
 const router = useRouter();
-const toPermissionManage = () => {
-  router.replace({
-    path: "/permission",
-  });
-};
-const toLogin = () => {
-  router.push({
-    path: "/login",
-  });
-};
-const toRegister = () => {
-  router.push({
-    path: "/register",
-  });
-};
+
 let showRightMenu = ref<boolean>(false);
 let optionsComopnent = reactive<MenuOptions>({
   items: [],
@@ -97,7 +98,8 @@ const rightClick = (event: MouseEvent, data: object) => {
   showRightMenu.value = true;
 };
 
-let categoryManageRef = ref(null);
+//let categoryManageRef = ref(null);
+let categoryManageRef = ref<InstanceType<typeof Category_manage> | null>(null);
 const handlCategory = (currNodeInfo: object) => {
   //处理顶级菜单添加分类
   if ("rootMenuFlag" in currNodeInfo) {
@@ -144,36 +146,47 @@ const handlCategory = (currNodeInfo: object) => {
 };
 
 const handlArticle = (currNodeInfo: object) => {
-  optionsComopnent.items.push(
-    { label: "编辑文章" },
-    {
-      label: "删除文章",
-      onClick: () => {
-        window.console.log(currNodeInfo);
-        let data = new ArticleData().articleForm;
-        data.path = currNodeInfo.path;
-        data.parentPath = currNodeInfo.parentPath;
-        data.articleTitle = currNodeInfo.articleTitle;
-        deleteArticle(data).then((res) => {
-          if (res.status != 200) {
-            ElMessage({
-              message: res.message,
-              type: "error",
-            });
-          } else {
-            ElMessage({
-              message: res.message,
-              type: "success",
-            });
-            router.go(0);
-          }
-        });
-      },
-    }
-  );
+  optionsComopnent.items.push({
+    label: "删除文章",
+    onClick: () => {
+      window.console.log(currNodeInfo);
+      let data = new ArticleData().articleForm;
+      data.path = currNodeInfo.path;
+      data.parentPath = currNodeInfo.parentPath;
+      data.articleTitle = currNodeInfo.articleTitle;
+      deleteArticle(data).then((res) => {
+        if (res.status != 200) {
+          ElMessage({
+            message: res.message,
+            type: "error",
+          });
+        } else {
+          ElMessage({
+            message: res.message,
+            type: "success",
+          });
+          router.go(0);
+        }
+      });
+    },
+  });
 };
 
-const authStore = useLoginStore();
+const toPermissionManage = () => {
+  router.replace({
+    path: "/permission",
+  });
+};
+const toLogin = () => {
+  router.push({
+    path: "/login",
+  });
+};
+const toRegister = () => {
+  router.push({
+    path: "/register",
+  });
+};
 const loginShowFlag = computed(() => {
   return getItemlLocalStorage("userAndToken") == null;
 });
@@ -188,6 +201,8 @@ const logoutShowFlag = computed(() => {
 const permissionShowFlag = computed(() => {
   return !!getItemlLocalStorage("userAndToken");
 });
+const authStore = useLoginStore();
+
 const logout = () => {
   authStore.user = null;
   removeItemLocalStorage("userAndToken");

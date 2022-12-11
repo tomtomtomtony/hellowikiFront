@@ -4,7 +4,8 @@ const Login = () => import("@/views/user/login.vue");
 const Register = () => import("@/views/user/register.vue");
 const GetArticle = () => import("@/views/article/articleDetail.vue");
 const CreateEditArticle = () => import("@/views/article/component/addEdit.vue");
-const PermissionManagement=()=>import("@/views/user/permissionManagement.vue");
+const PermissionManagement = () =>
+  import("@/views/user/permissionManagement.vue");
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -29,7 +30,7 @@ const router = createRouter({
         {
           path: "/article/getArticle",
           component: GetArticle,
-        }
+        },
       ],
     },
     {
