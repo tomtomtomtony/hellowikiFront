@@ -103,7 +103,7 @@ const submitForm = (formEI: FormInstance | undefined) => {
 
 
 const resetForm = () => {
-  registerFormRef.value.resetFields()
+  registerFormRef.value.resetFields();
 };
 </script>
 

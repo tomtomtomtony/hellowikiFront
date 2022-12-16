@@ -35,7 +35,7 @@ const toArticleDetail = (node: Node) => {
       },
     });
   }
-}
+};
 let data: Tree[] = [];
 //懒加载函数
 const loadNode = (node: Node, resolve: (data: Tree[]) => void) => {

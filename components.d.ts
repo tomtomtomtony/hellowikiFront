@@ -26,7 +26,10 @@ declare module '@vue/runtime-core' {
     ElTree: typeof import('element-plus/es')['ElTree']
     Header: typeof import('./src/components/header/header.vue')['default']
     IEpEdit: typeof import('~icons/ep/edit')['default']
+    IEpEye: typeof import('~icons/ep/eye')['default']
+    IEpHide: typeof import('~icons/ep/hide')['default']
     IEpSearch: typeof import('~icons/ep/search')['default']
+    IEpView: typeof import('~icons/ep/view')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
