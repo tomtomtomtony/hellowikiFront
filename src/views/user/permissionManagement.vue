@@ -2,14 +2,15 @@
   <div ref="permissionManagementRef">
     <el-tabs type="border-card">
       <el-tab-pane label="用户详情">
-        <el-table ref="userInfoRef" :data="tableData.list" border>
+        <el-table ref="userInfoRef" :data="userInfoTableData.list" border>
           <el-table-column label="id" prop="id"></el-table-column>
           <el-table-column label="用户名" prop="userName">
             <template v-slot="scope">
               {{ scope.row.userName }}
               <el-icon @click="toEditUserName(scope.row.id)">
                 <i-ep-edit></i-ep-edit
-              ></el-icon>
+                >
+              </el-icon>
             </template>
           </el-table-column>
           <el-table-column label="创建时间" prop="createAt"></el-table-column>
@@ -17,50 +18,76 @@
           <el-table-column label="角色" prop="roles">
             <template #default="scope">
               <div v-if="scope.row.RolesShow">
-                {{scope.row.userRolesView
-                }}<el-icon @click="scope.row.RolesShow = false"
-                  ><i-ep-view
-                /></el-icon>
+                {{ scope.row.userRolesView
+                }}
+                <el-icon @click="scope.row.RolesShow = false"
+                >
+                  <i-ep-view
+                  />
+                </el-icon>
               </div>
               <div v-else>
                 {{ userRolesHide
-                }}<el-icon @click="showRoles(scope.row)"><i-ep-hide /></el-icon>
+                }}
+                <el-icon @click="showRoles(scope.row)">
+                  <i-ep-hide />
+                </el-icon>
               </div>
             </template>
           </el-table-column>
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="角色配置">
-        <el-table>
-          <el-table-column label="角色" prop="role"></el-table-column>
+        <el-row :style="{margin: '6px 0 16px 0'}" justify="space-between" type="flex">
+          <el-button round size="small" type="primary" @click="toAddRole">新增</el-button>
+        </el-row>
+        <el-table :data="roleInfoTableData.list" stripe>
+          <el-table-column label="id" prop="id"></el-table-column>
+          <el-table-column label="角色" prop="roleName"></el-table-column>
+          <el-table-column label="创建时间" prop="createAt"></el-table-column>
+          <el-table-column label="更新时间" prop="updateAt"></el-table-column>
           <el-table-column label="权限" prop=""></el-table-column>
         </el-table>
       </el-tab-pane>
     </el-tabs>
     <div>
-      <edit-user-roles
-        ref="editRolesRef"
+      <EditUserInfo
+        ref="editUserInfoRef"
         @refresh="queryUserInfo"
-      ></edit-user-roles>
+      ></EditUserInfo>
+      <EditRole ref="editRoleRef" @refresh="queryRoleInfo"></EditRole>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import type { userInfoInt } from "@/type/permissionManagement";
+import type { roleInfoInt, userInfoInt } from "@/type/permissionManagement";
 import { onMounted, reactive, ref } from "vue";
-import { getUserInfo, getUserRoles } from "@/request/permissionManagement";
-import EditUserRoles from "@/views/user/components/editUser.vue";
+import {
+  getAllRoles,
+  getUserInfo,
+  getUserRoles,
+} from "@/request/permissionManagement";
+import EditUserInfo from "@/views/user/components/editUser.vue";
+import EditRole from "@/views/user/components/editRole.vue";
+import { RoleInfoData, UserInfoData } from "@/type/permissionManagement";
+let editUserInfoRef = ref(null);
+let editRoleRef = ref(null);
 
-let editRolesRef = ref(null);
-let tableData: { list: userInfoInt[] } = reactive({ list: [] });
+let userInfoTableData: { list: userInfoInt[] } = reactive({ list: [] });
+let roleInfoTableData: { list: roleInfoInt[] } = reactive({ list: [] });
 onMounted(() => {
   queryUserInfo();
+  queryRoleInfo();
 });
 
 const toEditUserName = (id: number) => {
   let target: string = "编辑用户名";
-  editRolesRef?.value?.handleEdit(id, target);
+  editUserInfoRef?.value?.handleEdit(id, target);
 };
+const toAddRole = () => {
+  editRoleRef?.value?.handleAdd();
+}
+//获取指定用户的角色
 let userRolesHide = ref("******");
 const showRoles = (row) => {
   getUserRoles(row.id).then((res) => {
@@ -68,7 +95,6 @@ const showRoles = (row) => {
       Reflect.set(row, "userRolesView", []);
       row.userRolesView.push(...res.data[0]);
       Reflect.set(row, "RolesShow", true);
-
       // userRolesView.value = [];
       // userRolesView.value.push(... res.data[0]);
       // RolesShow.value = true;
@@ -80,14 +106,15 @@ const showRoles = (row) => {
     }
   });
 };
+let ueserQueryCondition = new UserInfoData().userInfo;
 //查询用户列表
 const queryUserInfo = () => {
-  tableData.list = [];
-  getUserInfo().then((res) => {
+  userInfoTableData.list = [];
+  getUserInfo(ueserQueryCondition).then((res) => {
     if (res.status != 200) {
       ElMessage({
         message: res.message,
-        type: "error",
+        type: "error"
       });
     } else {
       if (res.data[0]?.length > 0) {
@@ -98,12 +125,38 @@ const queryUserInfo = () => {
           curr.updateAt = new Date(curr.updateAt)
             .toLocaleString()
             .split(" ")[0];
-          tableData.list.push(curr);
+          userInfoTableData.list.push(curr);
         }
       }
     }
   });
 };
+let roleQueryCondition = new RoleInfoData().roleInfo;
+//查询角色列表
+const queryRoleInfo = () => {
+  roleInfoTableData.list = [];
+  getAllRoles(roleQueryCondition).then((res) => {
+    if (res.status != 200) {
+      ElMessage({
+        message: res.message,
+        type: "error"
+      });
+    } else {
+      if (res.data[0]?.length > 0) {
+        for (let curr of res.data[0]) {
+          curr.createAt = new Date(curr.createAt)
+            .toLocaleString()
+            .split(" ")[0];
+          curr.updateAt = new Date(curr.updateAt)
+            .toLocaleString()
+            .split(" ")[0];
+          roleInfoTableData.list.push(curr);
+        }
+      }
+    }
+  });
+};
+
 </script>
 
 <style scoped></style>

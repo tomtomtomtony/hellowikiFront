@@ -2,7 +2,7 @@ export interface CategoryFormInt {
   name: string;
   parentName: string;
   path: string;
-  parentPath:string;
+  parentPath: string;
 }
 
 export class CategoryData {
