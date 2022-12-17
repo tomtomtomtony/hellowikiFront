@@ -66,7 +66,7 @@ const editUserRules = {
   userName: [
     { required: true, message: "请输入用户名", trigger: "change" },
     { max: 15, min: 6, message: "用户名应为6-15个字符", trigger: "blur" }
-  ]
+  ],
 };
 const editUserRef = ref<FormInstance>();
 

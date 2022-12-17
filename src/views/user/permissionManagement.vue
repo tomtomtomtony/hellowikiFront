@@ -6,23 +6,25 @@
           <el-table-column label="id" prop="id"></el-table-column>
           <el-table-column label="用户名" prop="userName">
             <template v-slot="scope">
-              {{scope.row.userName}}
-              <el-icon @click="toEditUserName(scope.row.id)"> <i-ep-edit></i-ep-edit></el-icon>
+              {{ scope.row.userName }}
+              <el-icon @click="toEditUserName(scope.row.id)">
+                <i-ep-edit></i-ep-edit
+              ></el-icon>
             </template>
           </el-table-column>
           <el-table-column label="创建时间" prop="createAt"></el-table-column>
           <el-table-column label="更新时间" prop="updateAt"></el-table-column>
           <el-table-column label="角色" prop="roles">
-            <template v-slot="scope">
-              <div v-if="RolesShow">
-                {{ userRolesView
-                }}<el-icon @click="RolesShow = false"><i-ep-view /></el-icon>
+            <template #default="scope">
+              <div v-if="scope.row.RolesShow">
+                {{scope.row.userRolesView
+                }}<el-icon @click="scope.row.RolesShow = false"
+                  ><i-ep-view
+                /></el-icon>
               </div>
               <div v-else>
                 {{ userRolesHide
-                }}<el-icon @click="showRoles(scope.row.id)"
-                  ><i-ep-hide
-                /></el-icon>
+                }}<el-icon @click="showRoles(scope.row)"><i-ep-hide /></el-icon>
               </div>
             </template>
           </el-table-column>
@@ -36,7 +38,10 @@
       </el-tab-pane>
     </el-tabs>
     <div>
-      <edit-user-roles ref="editRolesRef" @refresh="queryUserInfo"></edit-user-roles>
+      <edit-user-roles
+        ref="editRolesRef"
+        @refresh="queryUserInfo"
+      ></edit-user-roles>
     </div>
   </div>
 </template>
@@ -56,15 +61,17 @@ const toEditUserName = (id: number) => {
   let target: string = "编辑用户名";
   editRolesRef?.value?.handleEdit(id, target);
 };
-let RolesShow = ref(false);
-let userRolesView = ref([]);
 let userRolesHide = ref("******");
-const showRoles = (id: number) => {
-  getUserRoles(id).then((res) => {
+const showRoles = (row) => {
+  getUserRoles(row.id).then((res) => {
     if (res.status == 200) {
-      userRolesView.value=[]
-      userRolesView.value.push(... res.data[0]);
-      RolesShow.value = true;
+      Reflect.set(row, "userRolesView", []);
+      row.userRolesView.push(...res.data[0]);
+      Reflect.set(row, "RolesShow", true);
+
+      // userRolesView.value = [];
+      // userRolesView.value.push(... res.data[0]);
+      // RolesShow.value = true;
     } else {
       ElMessage({
         message: res.message,
