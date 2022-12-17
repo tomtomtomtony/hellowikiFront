@@ -28,7 +28,7 @@
 import { reactive, ref } from "vue";
 import { RoleInfoData } from "@/type/permissionManagement";
 import type { FormInstance } from "element-plus";
-import { editUserName } from "@/request/permissionManagement";
+import { createRole, editUserName } from "@/request/permissionManagement";
 const data = new RoleInfoData();
 let roleInfoForm = reactive(data.roleInfo);
 let showEdit = ref<boolean>(false);
@@ -44,12 +44,13 @@ const editRoleRules = {
     { max: 15, min: 6, message: "用户名应为6-15个字符", trigger: "blur" },
   ],
 };
+let emit = defineEmits(["refresh"]);
 const submitForm = (formEI: FormInstance | undefined) => {
   if (!formEI) return;
   formEI.validate((valid) => {
     if (!valid) return;
     if ("新增" == currTitle.value) {
-      editUserName(data.roleInfo).then((res) => {
+      createRole(data.roleInfo).then((res) => {
         if (res.status != 200) {
           ElMessage({
             message: res.message,

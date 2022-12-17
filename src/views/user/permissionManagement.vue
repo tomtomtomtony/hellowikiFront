@@ -117,8 +117,8 @@ const queryUserInfo = () => {
         type: "error"
       });
     } else {
-      if (res.data[0]?.length > 0) {
-        for (let curr of res.data[0]) {
+      if (res.data[0]?.userList.length > 0) {
+        for (let curr of res.data[0].userList) {
           curr.createAt = new Date(curr.createAt)
             .toLocaleString()
             .split(" ")[0];
@@ -142,8 +142,8 @@ const queryRoleInfo = () => {
         type: "error"
       });
     } else {
-      if (res.data[0]?.length > 0) {
-        for (let curr of res.data[0]) {
+      if (res.data[0]?.roleList?.length > 0) {
+        for (let curr of res.data[0].roleList) {
           curr.createAt = new Date(curr.createAt)
             .toLocaleString()
             .split(" ")[0];
@@ -154,6 +154,8 @@ const queryRoleInfo = () => {
         }
       }
     }
+    window.console.log(res)
+
   });
 };
 

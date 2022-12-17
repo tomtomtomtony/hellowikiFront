@@ -1,5 +1,6 @@
 import service from "@/request/index";
 import type { roleInfoInt, userInfoInt } from "@/type/permissionManagement";
+import { RegisterData } from "@/type/register";
 
 export function getUserInfo(data: userInfoInt) {
   return service.authorService({
@@ -26,6 +27,14 @@ export function editUserName(data: userInfoInt) {
   return service.authorService({
     url: `api/v1/user/editName/` + data.id,
     method: "put",
+    data,
+  });
+}
+
+export function createRole(data: roleInfoInt) {
+  return service.noAuthorService({
+    url: "api/v1/role/create",
+    method: "post",
     data,
   });
 }
