@@ -31,6 +31,14 @@ export function editUserName(data: userInfoInt) {
   });
 }
 
+export function updateUserRole(data: roleInfoInt) {
+  return service.authorService({
+    url: `api/v1/role/updateUserRole/` + data.id,
+    method: "put",
+    data,
+  });
+}
+
 export function createRole(data: roleInfoInt) {
   return service.noAuthorService({
     url: "api/v1/role/create",

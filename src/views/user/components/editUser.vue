@@ -28,24 +28,24 @@
 import { reactive, ref } from "vue";
 import type { FormInstance } from "element-plus";
 import { UserInfoData } from "@/type/permissionManagement";
-import { editUserName } from "@/request/permissionManagement";
+import { editUserName} from "@/request/permissionManagement";
 let showEdit = ref<boolean>(false);
 let currTitle = ref("");
-const data = new UserInfoData();
-let userInfoForm = reactive(data.userInfo);
-const handleEdit = (id: number, target: string) => {
-  currTitle.value = target;
+const userData = new UserInfoData();
+let userInfoForm = reactive(userData.userInfo);
+const handleEdit = (id: number) => {
+  currTitle.value = "编辑用户名";
   userInfoForm.id = id;
   showEdit.value = true;
 };
-let emit = defineEmits(["refresh"]);
+
+let emit = defineEmits(["queryUserInfo"]);
 const submitForm = (formEI: FormInstance | undefined) => {
   if (!formEI) return;
   formEI.validate((valid) => {
     if (!valid) return;
     if ("编辑用户名" == currTitle.value) {
-      window.console.log("hello");
-      editUserName(data.userInfo).then((res) => {
+      editUserName(userData.userInfo).then((res) => {
         if (res.status != 200) {
           ElMessage({
             message: res.message,
@@ -58,9 +58,10 @@ const submitForm = (formEI: FormInstance | undefined) => {
             message: res.message,
             type: "success",
           });
-          emit("refresh");
+          emit("queryUserInfo");
         }
       });
+      return;
     }
   });
 };

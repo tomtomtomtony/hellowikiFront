@@ -8,8 +8,7 @@
             <template v-slot="scope">
               {{ scope.row.userName }}
               <el-icon @click="toEditUserName(scope.row.id)">
-                <i-ep-edit></i-ep-edit
-                >
+                <i-ep-edit></i-ep-edit>
               </el-icon>
             </template>
           </el-table-column>
@@ -17,29 +16,39 @@
           <el-table-column label="更新时间" prop="updateAt"></el-table-column>
           <el-table-column label="角色" prop="roles">
             <template #default="scope">
-              <div v-if="scope.row.RolesShow">
-                {{ scope.row.userRolesView
-                }}
-                <el-icon @click="scope.row.RolesShow = false"
-                >
-                  <i-ep-view
-                  />
-                </el-icon>
-              </div>
-              <div v-else>
-                {{ userRolesHide
-                }}
-                <el-icon @click="showRoles(scope.row)">
-                  <i-ep-hide />
-                </el-icon>
-              </div>
+              {{
+                scope.row.RolesShow ? scope.row.userRolesView : userRolesHide
+              }}
+              <el-icon
+                @click="
+                  scope.row.RolesShow
+                    ? (scope.row.RolesShow = false)
+                    : showRoles(scope.row)
+                "
+              >
+
+                <div v-if="scope.row.RolesShow"><i-ep-view /></div>
+                <div v-else><i-ep-hide /></div>
+              </el-icon>
+              <el-button
+                link
+                v-show="scope.row.RolesShow"
+                :icon="Edit"
+                @click="toEditRolesForUser(scope.row.id,scope.row.userRolesView)"
+              ></el-button>
             </template>
           </el-table-column>
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="角色配置">
-        <el-row :style="{margin: '6px 0 16px 0'}" justify="space-between" type="flex">
-          <el-button round size="small" type="primary" @click="toAddRole">新增</el-button>
+        <el-row
+          :style="{ margin: '6px 0 16px 0' }"
+          justify="space-between"
+          type="flex"
+        >
+          <el-button round size="small" type="primary" @click="toAddRole"
+            >新增</el-button
+          >
         </el-row>
         <el-table :data="roleInfoTableData.list" stripe>
           <el-table-column label="id" prop="id"></el-table-column>
@@ -53,13 +62,18 @@
     <div>
       <EditUserInfo
         ref="editUserInfoRef"
-        @refresh="queryUserInfo"
+        @queryUserInfo="queryUserInfo"
       ></EditUserInfo>
-      <EditRole ref="editRoleRef" @refresh="queryRoleInfo"></EditRole>
+      <EditRole
+        ref="editRoleRef"
+        @queryRoleInfo="queryRoleInfo"
+        @queryUserInfo="queryUserInfo"
+      ></EditRole>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
+import { Edit } from "@element-plus/icons-vue";
 import type { roleInfoInt, userInfoInt } from "@/type/permissionManagement";
 import { onMounted, reactive, ref } from "vue";
 import {
@@ -79,14 +93,15 @@ onMounted(() => {
   queryUserInfo();
   queryRoleInfo();
 });
-
 const toEditUserName = (id: number) => {
-  let target: string = "编辑用户名";
-  editUserInfoRef?.value?.handleEdit(id, target);
+  editUserInfoRef?.value?.handleEdit(id);
 };
 const toAddRole = () => {
   editRoleRef?.value?.handleAdd();
-}
+};
+const toEditRolesForUser = (id: number, userRolesView: []) => {
+  editRoleRef?.value?.handleEditRoleForUser(id, roleInfoTableData.list,userRolesView);
+};
 //获取指定用户的角色
 let userRolesHide = ref("******");
 const showRoles = (row) => {
@@ -114,7 +129,7 @@ const queryUserInfo = () => {
     if (res.status != 200) {
       ElMessage({
         message: res.message,
-        type: "error"
+        type: "error",
       });
     } else {
       if (res.data[0]?.userList.length > 0) {
@@ -139,7 +154,7 @@ const queryRoleInfo = () => {
     if (res.status != 200) {
       ElMessage({
         message: res.message,
-        type: "error"
+        type: "error",
       });
     } else {
       if (res.data[0]?.roleList?.length > 0) {
@@ -154,11 +169,9 @@ const queryRoleInfo = () => {
         }
       }
     }
-    window.console.log(res)
-
+    window.console.log(res);
   });
 };
-
 </script>
 
 <style scoped></style>

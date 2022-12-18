@@ -22,6 +22,7 @@ export class UserInfoData {
 
 export interface roleInfoInt {
   roleName: string;
+  roles: [];
   id: number;
   createAt: number;
   updateAt: number;
@@ -33,6 +34,7 @@ export class RoleInfoData {
   roleInfo: roleInfoInt = {
     roleName: "",
     id: 0,
+    roles: [],
     createAt: 0,
     updateAt: 0,
     pageSize: 10,
