@@ -50,7 +50,7 @@
 import { PermissionInfoData } from "@/type/permissionManagement";
 import { reactive, ref } from "vue";
 import type { FormInstance } from "element-plus";
-import { createRole, updateUserRole } from "@/request/permissionManagement";
+import { createPermission, createRole, updateUserRole } from "@/request/permissionManagement";
 let permissionOption = ref();
 
 const data = new PermissionInfoData();
@@ -75,13 +75,14 @@ const editPermissionRules = {
     },
   ],
 };
+
+let emit = defineEmits(["queryPermissionInfo"]);
 const submitForm = (formEI: FormInstance | undefined) => {
   if (!formEI) return;
-
   formEI.validate((valid) => {
     if (!valid) return;
     if ("新增" == currTitle.value) {
-      createRole(data.permissionInfo).then((res) => {
+      createPermission(data.permissionInfo).then((res) => {
         if (res.status != 200) {
           ElMessage({
             message: res.message,
@@ -94,7 +95,7 @@ const submitForm = (formEI: FormInstance | undefined) => {
             message: res.message,
             type: "success",
           });
-          emit("queryRoleInfo");
+          emit("queryPermissionInfo");
         }
       });
       return;

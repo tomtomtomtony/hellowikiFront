@@ -54,3 +54,12 @@ export function createRole(data: roleInfoInt) {
     data,
   });
 }
+
+
+export function createPermission(data: permissionInfoInt) {
+  return service.authorService({
+    url: "api/v1/permission/create",
+    method: "post",
+    data,
+  });
+}

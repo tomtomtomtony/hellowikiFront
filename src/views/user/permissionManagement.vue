@@ -111,7 +111,8 @@
         @queryRoleInfo="queryRoleInfo"
         @queryUserInfo="queryUserInfo"
       ></EditRole>
-      <EditPermission ref="editPermissionRef"></EditPermission>
+      <EditPermission ref="editPermissionRef"         @queryPermissionInfo="queryPermissionInfo"
+      ></EditPermission>
     </div>
   </div>
 </template>
@@ -158,6 +159,11 @@ const toEditUserName = (id: number) => {
 const toAddRole = () => {
   editRoleRef?.value?.handleAdd();
 };
+
+const toAddPermission = () => {
+  editPermissionRef?.value?.handleAdd();
+};
+
 const toEditRolesForUser = (id: number, userRolesView: []) => {
   editRoleRef?.value?.handleEditRoleForUser(
     id,
