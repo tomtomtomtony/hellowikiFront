@@ -41,3 +41,26 @@ export class RoleInfoData {
     pageNum: 1,
   };
 }
+
+
+export interface permissionInfoInt {
+  permissionName: string;
+  permissions: [];
+  id: number;
+  createAt: number;
+  updateAt: number;
+  pageSize: number;
+  pageNum: number;
+}
+
+export class PermissionInfoData {
+  permissionInfo: permissionInfoInt = {
+    permissionName: "",
+    id: 0,
+    permissions: [],
+    createAt: 0,
+    updateAt: 0,
+    pageSize: 10,
+    pageNum: 1,
+  };
+}

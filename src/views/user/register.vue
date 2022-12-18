@@ -57,7 +57,7 @@
 
 <script lang="ts" setup>
 import { RegisterData } from "@/type/register";
-import { reactive, ref, unref } from "vue";
+import { reactive, ref} from "vue";
 import type { FormInstance } from "element-plus";
 import { register } from "@/request/register";
 
@@ -89,18 +89,16 @@ const submitForm = (formEI: FormInstance | undefined) => {
           message: res.message,
           type: "error",
         });
-      }else{
+      } else {
         resetForm();
         ElMessage({
           message: res.message,
           type: "success",
         });
       }
-    })
+    });
   });
 };
-
-
 
 const resetForm = () => {
   registerFormRef.value.resetFields();

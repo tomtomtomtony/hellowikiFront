@@ -50,12 +50,34 @@
             >新增</el-button
           >
         </el-row>
-        <el-table :data="roleInfoTableData.list" stripe>
+        <el-table :data="roleInfoTableData.roleList" stripe>
           <el-table-column label="id" prop="id"></el-table-column>
           <el-table-column label="角色" prop="roleName"></el-table-column>
           <el-table-column label="创建时间" prop="createAt"></el-table-column>
           <el-table-column label="更新时间" prop="updateAt"></el-table-column>
-          <el-table-column label="权限" prop=""></el-table-column>
+          <el-table-column label="权限" prop="">
+            <template #default="scope">
+              {{
+                scope.row.permissionShow ? scope.row.permissionView : permissionHide
+              }}
+              <el-icon
+                @click="
+                  scope.row.permissionShow
+                    ? (scope.row.permissionShow = false)
+                    : showPermissions(scope.row)
+                "
+              >
+                <div v-if="scope.row.permissionShow"><i-ep-view /></div>
+                <div v-else><i-ep-hide /></div>
+              </el-icon>
+              <el-button
+                link
+                v-show="scope.row.permissionShow"
+                :icon="Edit"
+                @click="toEditPermissionForRole(scope.row.id,scope.row.permissionView)"
+              ></el-button>
+            </template>
+          </el-table-column>
         </el-table>
       </el-tab-pane>
     </el-tabs>
@@ -88,7 +110,7 @@ let editUserInfoRef = ref(null);
 let editRoleRef = ref(null);
 
 let userInfoTableData: { list: userInfoInt[] } = reactive({ list: [] });
-let roleInfoTableData: { list: roleInfoInt[] } = reactive({ list: [] });
+let roleInfoTableData: { roleList: roleInfoInt[] } = reactive({ roleList: [] });
 onMounted(() => {
   queryUserInfo();
   queryRoleInfo();
@@ -100,8 +122,12 @@ const toAddRole = () => {
   editRoleRef?.value?.handleAdd();
 };
 const toEditRolesForUser = (id: number, userRolesView: []) => {
-  editRoleRef?.value?.handleEditRoleForUser(id, roleInfoTableData.list,userRolesView);
+  editRoleRef?.value?.handleEditRoleForUser(id, roleInfoTableData.roleList,userRolesView);
 };
+//获取指定角色的权限
+let permissionHide = ref("******");
+const showPermissions = (row) => {};
+
 //获取指定用户的角色
 let userRolesHide = ref("******");
 const showRoles = (row) => {
@@ -149,7 +175,8 @@ const queryUserInfo = () => {
 let roleQueryCondition = new RoleInfoData().roleInfo;
 //查询角色列表
 const queryRoleInfo = () => {
-  roleInfoTableData.list = [];
+  roleInfoTableData.roleList = [];
+  roleInfoTableData
   getAllRoles(roleQueryCondition).then((res) => {
     if (res.status != 200) {
       ElMessage({
@@ -165,7 +192,7 @@ const queryRoleInfo = () => {
           curr.updateAt = new Date(curr.updateAt)
             .toLocaleString()
             .split(" ")[0];
-          roleInfoTableData.list.push(curr);
+          roleInfoTableData.roleList.push(curr);
         }
       }
     }

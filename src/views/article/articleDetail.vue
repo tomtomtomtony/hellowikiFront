@@ -32,7 +32,7 @@ let articleJson = new ArticleData().articleForm;
 //监视路由参数变化
 watchEffect(() => {
   articleHtml.value = "";
-  data.path =route.query.path
+  data.path = route.query.path;
   data.parentPath=route.query.parentPath
   getArticleDetail(data).then((res) => {
     if (Array.isArray(res.data)) {
@@ -59,7 +59,7 @@ const queryArticle = () => {
       let jsonObject = JSON.parse(res.data[0]);
       articleJson = jsonObject; //为编辑作准备
       articleJson.path = data.path;
-      articleJson.parentPath=data.parentPath
+      articleJson.parentPath = data.parentPath;
       let md = new MarkdownIt();
       md.use(hljs).use(latex);
       articleHtml.content = md.render(jsonObject.content);

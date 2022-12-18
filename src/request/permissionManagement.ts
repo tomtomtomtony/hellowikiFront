@@ -40,7 +40,7 @@ export function updateUserRole(data: roleInfoInt) {
 }
 
 export function createRole(data: roleInfoInt) {
-  return service.noAuthorService({
+  return service.authorService({
     url: "api/v1/role/create",
     method: "post",
     data,
