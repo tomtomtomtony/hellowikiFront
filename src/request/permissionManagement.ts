@@ -1,5 +1,5 @@
 import service from "@/request/index";
-import type { roleInfoInt, userInfoInt } from "@/type/permissionManagement";
+import type { permissionInfoInt, roleInfoInt, userInfoInt } from "@/type/permissionManagement";
 import { RegisterData } from "@/type/register";
 
 export function getUserInfo(data: userInfoInt) {
@@ -19,6 +19,14 @@ export function getUserRoles(userId: number) {
 export function getAllRoles(data: roleInfoInt) {
   return service.authorService({
     url: `api/v1/role/all?`+'pageNum='+data.pageNum+'&pageSize='+data.pageSize,
+    method: "get",
+  });
+}
+
+//查询权限信息
+export function getAllPermission(data: permissionInfoInt) {
+  return service.authorService({
+    url: `api/v1/permission/all?`+'pageNum='+data.pageNum+'&pageSize='+data.pageSize,
     method: "get",
   });
 }

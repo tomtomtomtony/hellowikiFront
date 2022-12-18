@@ -26,7 +26,6 @@
                     : showRoles(scope.row)
                 "
               >
-
                 <div v-if="scope.row.RolesShow"><i-ep-view /></div>
                 <div v-else><i-ep-hide /></div>
               </el-icon>
@@ -34,7 +33,9 @@
                 link
                 v-show="scope.row.RolesShow"
                 :icon="Edit"
-                @click="toEditRolesForUser(scope.row.id,scope.row.userRolesView)"
+                @click="
+                  toEditRolesForUser(scope.row.id, scope.row.userRolesView)
+                "
               ></el-button>
             </template>
           </el-table-column>
@@ -58,7 +59,9 @@
           <el-table-column label="权限" prop="">
             <template #default="scope">
               {{
-                scope.row.permissionShow ? scope.row.permissionView : permissionHide
+                scope.row.permissionShow
+                  ? scope.row.permissionView
+                  : permissionHide
               }}
               <el-icon
                 @click="
@@ -74,10 +77,27 @@
                 link
                 v-show="scope.row.permissionShow"
                 :icon="Edit"
-                @click="toEditPermissionForRole(scope.row.id,scope.row.permissionView)"
+                @click="toEditRolesForUser(scope.row.id, scope.row.permissionView)"
               ></el-button>
             </template>
           </el-table-column>
+        </el-table>
+      </el-tab-pane>
+      <el-tab-pane label="权限类型配置">
+        <el-row
+          :style="{ margin: '6px 0 16px 0' }"
+          justify="space-between"
+          type="flex"
+        >
+          <el-button round size="small" type="primary" @click="toAddPermission"
+            >新增</el-button
+          >
+        </el-row>
+        <el-table :data="permissionInfoTableData.permissionList" stripe>
+          <el-table-column label="id" prop="id"></el-table-column>
+          <el-table-column label="权限" prop="permissionName"></el-table-column>
+          <el-table-column label="创建时间" prop="createAt"></el-table-column>
+          <el-table-column label="更新时间" prop="updateAt"></el-table-column>
         </el-table>
       </el-tab-pane>
     </el-tabs>
@@ -91,29 +111,46 @@
         @queryRoleInfo="queryRoleInfo"
         @queryUserInfo="queryUserInfo"
       ></EditRole>
+      <EditPermission ref="editPermissionRef"></EditPermission>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import { Edit } from "@element-plus/icons-vue";
-import type { roleInfoInt, userInfoInt } from "@/type/permissionManagement";
+import type {
+  permissionInfoInt,
+  roleInfoInt,
+  userInfoInt,
+} from "@/type/permissionManagement";
 import { onMounted, reactive, ref } from "vue";
 import {
+  getAllPermission,
   getAllRoles,
   getUserInfo,
   getUserRoles,
 } from "@/request/permissionManagement";
 import EditUserInfo from "@/views/user/components/editUser.vue";
 import EditRole from "@/views/user/components/editRole.vue";
-import { RoleInfoData, UserInfoData } from "@/type/permissionManagement";
+import {
+  PermissionInfoData,
+  RoleInfoData,
+  UserInfoData,
+} from "@/type/permissionManagement";
+import EditPermission from "@/views/user/components/editPermission.vue";
 let editUserInfoRef = ref(null);
 let editRoleRef = ref(null);
+let editPermissionRef = ref(null);
 
 let userInfoTableData: { list: userInfoInt[] } = reactive({ list: [] });
 let roleInfoTableData: { roleList: roleInfoInt[] } = reactive({ roleList: [] });
+let permissionInfoTableData: { permissionList: permissionInfoInt[] } = reactive(
+  { permissionList: [] }
+);
+
 onMounted(() => {
   queryUserInfo();
   queryRoleInfo();
+  queryPermissionInfo();
 });
 const toEditUserName = (id: number) => {
   editUserInfoRef?.value?.handleEdit(id);
@@ -122,7 +159,11 @@ const toAddRole = () => {
   editRoleRef?.value?.handleAdd();
 };
 const toEditRolesForUser = (id: number, userRolesView: []) => {
-  editRoleRef?.value?.handleEditRoleForUser(id, roleInfoTableData.roleList,userRolesView);
+  editRoleRef?.value?.handleEditRoleForUser(
+    id,
+    roleInfoTableData.roleList,
+    userRolesView
+  );
 };
 //获取指定角色的权限
 let permissionHide = ref("******");
@@ -176,7 +217,6 @@ let roleQueryCondition = new RoleInfoData().roleInfo;
 //查询角色列表
 const queryRoleInfo = () => {
   roleInfoTableData.roleList = [];
-  roleInfoTableData
   getAllRoles(roleQueryCondition).then((res) => {
     if (res.status != 200) {
       ElMessage({
@@ -199,6 +239,32 @@ const queryRoleInfo = () => {
     window.console.log(res);
   });
 };
+let permissionQueryCondition = new PermissionInfoData().permissionInfo;
+//查询权限列表
+const queryPermissionInfo = () => {
+  permissionInfoTableData.permissionList = [];
+  getAllPermission(permissionQueryCondition).then((res) => {
+    if (res.status != 200) {
+      ElMessage({
+        message: res.message,
+        type: "error",
+      });
+    } else {
+      if (res.data[0]?.permissionList?.length > 0) {
+        for (let curr of res.data[0].permissionList) {
+          curr.createAt = new Date(curr.createAt)
+            .toLocaleString()
+            .split(" ")[0];
+          curr.updateAt = new Date(curr.updateAt)
+            .toLocaleString()
+            .split(" ")[0];
+          permissionInfoTableData.permissionList.push(curr);
+        }
+      }
+    }
+  });
+};
+
 </script>
 
 <style scoped></style>
